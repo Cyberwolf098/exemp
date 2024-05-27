@@ -1,0 +1,97 @@
+#Manb group yo: Saintil Ralph Jacky,  St Martin Kalancia,  Exzard Jean Abellard, Elishama Dory, Montissol Steevens, Estinvil Clivinve
+import pandas as pd
+from datetime import datetime
+#impote fichye
+df = pd.read_csv('C:/Users/Marie-Pierrette/OneDrive/Documents/Python_Data/Company.csv')
+df=pd.DataFrame(df)
+#print(df)
+#netwaye salary
+df['salary'] = df['salary'].str.replace('K','000').str.replace(',','').str.replace('.','')
+#konveti str an float
+df['salary']=df['salary'].astype(float)
+# ajiste sale
+#def ajiste_sale(sal):
+    #if sal<100:
+        #sal=sal*1000
+    #return sal
+
+#df['salary']= df['salary'].apply(ajiste_sale)
+
+# ranplase Nan
+df['salary']=df['salary'].fillna(0)
+#print(df)
+#fin netwaye salary nap pase a colon years, education, genre
+
+df['years_at_company']=df['years_at_company'].str.replace('years','')
+#print(df['years_at_company'])
+df['education_level']=df['education_level'].fillna('unknow')
+#print(df['education_level'])
+
+df['gender']=df['gender'].str.replace('Female','F').str.replace('Male','M')
+#print(df['gender'])
+
+# Netwayaj kolon dat la
+def parse_date(date_str):
+    for fmt in ("%d-%m-%Y", "%d-%b-%Y", "%d-%b-%y", "%m/%d/%Y", "%Y-%m-%d","%d-%m-%y"):
+        try:
+            return datetime.strptime(date_str, fmt)
+        except ValueError:
+            continue
+    return pd.NaT  # Retourner NaT si aucun format ne correspond
+
+# Appliquer la fonction à la colonne 'hired_date' pour obtenir des objets datetime
+df['hired_date'] = df['hired_date'].apply(parse_date)
+
+# Convertir les objets datetime en chaînes de caractères au format %d-%b-%y
+df['hired_date'] = df['hired_date'].dt.strftime("%d-%b-%y")
+print(df)
+
+by_department = df.groupby(['department'])
+for department, group in by_department:
+    print(f"Department:{department}")
+    print(group[['employee_id','department']])
+
+for department, group in by_department:
+    print(f"Department: {department}")
+    print(group[['employee_id', 'age']])
+    average_age = group['age'].mean()
+    print(f"Average age in {department}: {average_age:.2f}\n")
+
+for department, group in by_department:
+     print(f"Department:{department}")
+     print(group[['employee_id','gender']])
+
+
+for department, group in by_department:
+    print(f"Department: {department}")
+    print(group[['employee_id', 'salary']])
+    average_salary = group['salary'].mean()
+    print(f"Average salary in {department}: {average_salary:.2f}\n")
+
+
+for department, group in by_department:
+    print(f"Department: {department}")
+    print(group[['employee_id', 'job_satisfaction']])
+
+
+current_year = 2024
+
+
+df['years_since_last_promotion'] = current_year - df['last_promotion_year']
+
+for department, group in by_department:
+    print(f"Department: {department}")
+    print(group[['employee_id', 'years_since_last_promotion']])
+    average_years_since_promotion = group['years_since_last_promotion'].mean()
+    print(f"Average years since last promotion in {department}: {average_years_since_promotion:.2f}\n")
+
+by_education = df.groupby(['education_level'])
+for education, group in by_education:
+    print(f"Education: {education}")
+    print(group[['education_level', 'salary']])
+    average_salary = group['salary'].mean()
+    print(f"Average salary for {education}: {average_salary:.2f}\n")
+
+
+
+
